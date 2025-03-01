@@ -1,0 +1,43 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'application/providers/user_provider.dart';
+import 'presentation/pages/login_page.dart';
+import 'presentation/pages/stopwatch_page.dart';
+
+void main() async {
+  // Flutter 엔진 초기화 보장
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // SharedPreferences에서 사용자 ID 가져오기
+  final prefs = await SharedPreferences.getInstance();
+  final userId = prefs.getString('userId') ?? '';
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        // 저장된 사용자 ID로 프로바이더 초기화
+        userIdProvider.overrideWith((ref) => userId),
+      ],
+      child: const MyApp(),
+    ),
+  );
+}
+
+class MyApp extends ConsumerWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 사용자 ID 가져오기
+    final userId = ref.watch(userIdProvider);
+
+    return MaterialApp(
+      title: '실시간 스톱워치',
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
+      // 사용자 ID가 있으면 스톱워치 페이지로, 없으면 로그인 페이지로 이동
+      home: userId.isNotEmpty ? const StopwatchPage() : const LoginPage(),
+    );
+  }
+}
