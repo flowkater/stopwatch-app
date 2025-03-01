@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'application/providers/user_provider.dart';
+import 'application/providers/providers.dart';
 import 'presentation/pages/login_page.dart';
 import 'presentation/pages/stopwatch_page.dart';
 

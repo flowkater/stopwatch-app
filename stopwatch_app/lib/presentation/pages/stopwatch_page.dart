@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../application/providers/user_provider.dart';
+import '../../application/providers/providers.dart';
 import '../widgets/user_list.dart';
 import '../widgets/stopwatch_widget.dart';
 import 'login_page.dart';

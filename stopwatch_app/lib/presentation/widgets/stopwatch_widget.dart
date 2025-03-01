@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../application/providers/user_provider.dart';
+import '../../application/providers/providers.dart';
 
 class StopwatchWidget extends ConsumerWidget {
   const StopwatchWidget({super.key});
