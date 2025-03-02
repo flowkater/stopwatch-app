@@ -1,28 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stopwatch_app/application/providers/usercase/usecase_providers.dart';
 
 import 'application/providers/providers.dart';
 import 'presentation/pages/login_page.dart';
 import 'presentation/pages/stopwatch_page.dart';
 
 void main() async {
-  // Flutter 엔진 초기화 보장
   WidgetsFlutterBinding.ensureInitialized();
 
   // SharedPreferences에서 사용자 ID 가져오기
   final prefs = await SharedPreferences.getInstance();
   final userId = prefs.getString('userId') ?? '';
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        // 저장된 사용자 ID로 프로바이더 초기화
-        userIdProvider.overrideWith((ref) => userId),
-      ],
-      child: const MyApp(),
-    ),
+  final container = ProviderContainer(
+    overrides: [userIdProvider.overrideWith((ref) => userId)],
   );
+
+  // 사용자 ID가 있으면 앱 초기화 수행
+  if (userId.isNotEmpty) {
+    try {
+      final initUseCase = container.read(appInitializationUseCaseProvider);
+      await initUseCase.initializeApp(userId);
+    } catch (e) {
+      print('앱 초기화 오류: $e');
+      // 오류 처리 (예: 사용자 ID 삭제)
+      await prefs.remove('userId');
+    }
+  }
+
+  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
 }
 
 class MyApp extends ConsumerWidget {

@@ -6,7 +6,10 @@ import '../config/constants.dart';
 
 // 웹소켓 레포지토리 프로바이더
 final userRepositoryProvider = Provider<UserRepository>((ref) {
-  final repository = WebSocketUserRepository(serverUrl: kWebSocketServerUrl);
+  final repository = WebSocketUserRepository(
+    serverUrl: serverUrl,
+    webSocketServerUrl: webSocketServerUrl,
+  );
 
   // 연결 시작
   repository.connect();

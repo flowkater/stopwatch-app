@@ -10,4 +10,9 @@ class GetAllUsersUseCase {
   Stream<UserState> getAllUserStates() {
     return _repository.getUserStateStream();
   }
+
+  Future<List<UserState>> getAllInitialUserStates() async {
+    // 서버에서 모든 사용자 상태를 가져오는 API 호출
+    return await _repository.getAllUserStates();
+  }
 }

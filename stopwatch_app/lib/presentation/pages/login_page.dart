@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:stopwatch_app/application/providers/provider_reset.dart';
 import '../../application/providers/providers.dart';
+import '../../application/providers/usercase/usecase_providers.dart';
 import 'stopwatch_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -33,14 +33,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     try {
+      resetAllProviders(ref);
       final userId = _userIdController.text.trim();
 
-      // SharedPreferences에 사용자 ID 저장
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('userId', userId);
+      print('userId: $userId');
 
       // 사용자 ID 프로바이더 업데이트
       ref.read(userIdProvider.notifier).update((state) => userId);
+
+      // 인증 유즈케이스 사용
+      final authUseCase = ref.read(authUseCaseProvider);
+      await authUseCase.login(userId);
 
       if (mounted) {
         // 스톱워치 페이지로 이동

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:stopwatch_app/application/providers/provider_reset.dart';
 import '../../application/providers/providers.dart';
+import '../../application/providers/usercase/usecase_providers.dart';
 import '../widgets/user_list.dart';
 import '../widgets/stopwatch_widget.dart';
 import 'login_page.dart';
@@ -36,18 +36,28 @@ class StopwatchPage extends ConsumerWidget {
       return;
     }
 
-    // SharedPreferences에서 사용자 ID 삭제
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userId');
+    // 로그아웃 유즈케이스 실행
+    final userId = ref.read(userIdProvider);
+    final authUseCase = ref.read(authUseCaseProvider);
 
-    // 사용자 ID 프로바이더 초기화
-    ref.read(userIdProvider.notifier).update((_) => '');
-
-    // 로그인 페이지로 이동
-    if (context.mounted) {
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const LoginPage()));
+    try {
+      await authUseCase.logout(userId);
+      // 사용자 ID 프로바이더 초기화
+      resetAllProviders(ref);
+      // 로그인 페이지로 이동
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+          (route) => false, // 모든 이전 경로 제거
+        );
+      }
+    } catch (e) {
+      // 에러 처리
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('로그아웃 중 오류가 발생했습니다: $e')));
+      }
     }
   }
 
@@ -80,12 +90,8 @@ class StopwatchPage extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // (1) 상단: 원형 프로필 목록 (인스타 스토리 UI 유사)
           const UserList(),
-
           const Divider(),
-
-          // (2) 내 스톱워치 UI
           const Expanded(child: StopwatchWidget()),
         ],
       ),

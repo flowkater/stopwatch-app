@@ -7,6 +7,9 @@ abstract class UserRepository {
   // 사용자 상태 스트림 구독
   Stream<UserState> getUserStateStream();
 
+  // 사용자 상태 조회
+  Future<UserState> getUserState(String userId);
+
   // 연결 종료
   Future<void> closeConnection();
 
@@ -15,4 +18,6 @@ abstract class UserRepository {
 
   // 특정 사용자의 상태 스트림 구독
   Stream<UserState> getUserStateStreamFor(String userId);
+
+  Future<List<UserState>> getAllUserStates();
 }

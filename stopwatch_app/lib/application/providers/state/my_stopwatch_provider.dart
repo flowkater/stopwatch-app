@@ -8,6 +8,11 @@ import '../usercase/usecase_providers.dart';
 // 내 스톱워치 상태 프로바이더
 final myStopwatchProvider =
     StateNotifierProvider<MyStopwatchNotifier, AsyncValue<UserState>>((ref) {
+      final userId = ref.watch(myUserIdProvider);
+      // userId가 비어있으면 로딩 상태 유지
+      if (userId.isEmpty) {
+        return MyStopwatchNotifier(ref)..setLoading();
+      }
       return MyStopwatchNotifier(ref);
     });
 
@@ -19,18 +24,35 @@ class MyStopwatchNotifier extends StateNotifier<AsyncValue<UserState>> {
     _init();
   }
 
+  void setLoading() {
+    state = const AsyncLoading();
+  }
+
   void _init() async {
     final myUserId = _ref.read(myUserIdProvider);
+
+    if (myUserId.isEmpty) {
+      state = const AsyncLoading();
+      return;
+    }
+
     final stopwatchUseCase = _ref.read(manageStopwatchUseCaseProvider);
 
     try {
-      // 초기 상태 설정
-      final initialState = await stopwatchUseCase.initializeStopwatch(myUserId);
-      state = AsyncData(initialState);
+      // 이미 초기화된 상태를 가져옴 (초기화는 하지 않음)
+      print('------------------------------------');
+      print('------------------------------------');
+      print('------------------------------------');
+      print('Provider 초기화시!!!! myUserId: $myUserId');
+      final currentState = await stopwatchUseCase.getCurrentState(myUserId);
+      print('currentState: ${currentState.toJson()}');
+      state = AsyncData(currentState);
+      print('state: ${state.toString()}');
 
       // 타이머 설정
       _setupTimer();
     } catch (e) {
+      print('stopwatch초기화 오류: $e');
       state = AsyncError(e, StackTrace.current);
     }
   }
@@ -74,6 +96,7 @@ class MyStopwatchNotifier extends StateNotifier<AsyncValue<UserState>> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timer = null;
     super.dispose();
   }
 }

@@ -36,7 +36,7 @@ class UserList extends ConsumerWidget {
 class _UserAvatar extends StatelessWidget {
   final UserState user;
 
-  const _UserAvatar({super.key, required this.user});
+  const _UserAvatar({required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +47,7 @@ class _UserAvatar extends StatelessWidget {
         children: [
           // 원형 아바타
           CircleAvatar(
+            key: Key(user.userId),
             radius: 25,
             backgroundColor:
                 user.online
