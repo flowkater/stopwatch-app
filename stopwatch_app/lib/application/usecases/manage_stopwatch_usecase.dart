@@ -6,10 +6,20 @@ class ManageStopwatchUseCase {
 
   ManageStopwatchUseCase(this._repository);
 
-  // 이 메서드는 이제 앱 초기화 이후에 호출된다고 가정
-  // 상태를 가져오기만 하고 초기화는 하지 않음
+  // 사용자 상태를 가져오되, 404 오류 시 새 상태 생성
   Future<UserState> getCurrentState(String userId) async {
-    return await _repository.getUserState(userId);
+    try {
+      return await _repository.getUserState(userId);
+    } catch (e) {
+      // 사용자 상태가 없을 경우 (404 등) 새로운의 기본 상태 반환
+      print('사용자 상태를 가져오는 중 오류 발생: $e, 새 상태 생성');
+      return UserState(
+        userId: userId,
+        online: true,
+        stopwatchRunning: false,
+        elapsedTime: 0,
+      );
+    }
   }
 
   Future<UserState> startStopwatch(UserState currentState) async {

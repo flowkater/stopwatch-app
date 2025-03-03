@@ -33,13 +33,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     try {
+      // 먼저 모든 프로바이더 초기화
       resetAllProviders(ref);
       final userId = _userIdController.text.trim();
 
-      print('userId: $userId');
-
-      // 사용자 ID 프로바이더 업데이트
-      ref.read(userIdProvider.notifier).update((state) => userId);
+      // userId를 설정 (Provider 초기화 후)
+      ref.read(userIdProvider.notifier).state = userId;
 
       // 인증 유즈케이스 사용
       final authUseCase = ref.read(authUseCaseProvider);

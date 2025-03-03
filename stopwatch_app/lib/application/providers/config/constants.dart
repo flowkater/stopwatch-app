@@ -1,5 +1,8 @@
+// import 'package:flutter/foundation.dart';
+
 // 개발 환경 설정 (true: 개발 환경, false: 프로덕션 환경)
-const bool isDev = true;
+const bool isDev = false;
+// const bool isDev = kDebugMode;
 
 // 서버 URL 설정
 const serverUrl =
