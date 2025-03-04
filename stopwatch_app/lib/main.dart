@@ -40,6 +40,9 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // 사용자 ID 가져오기
     final userId = ref.watch(userIdProvider);
+    
+    // 앱 생명주기 서비스 초기화 (이 줄은 서비스를 활성화만 하고 결과는 사용하지 않음)
+    ref.watch(appLifecycleProvider);
 
     return MaterialApp(
       title: '실시간 스톱워치',

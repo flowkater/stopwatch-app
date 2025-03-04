@@ -2,7 +2,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../domain/models/user_state.dart';
 import '../providers.dart';
 
-/// 정렬되고 처리된 사용자 목록을 제공하는 프로바이더
+/// 사용자 정렬 및 UI 데이터 변환에 관련된 프로바이더들
+
+/// 사용자 정렬 우선순위 계산 유틸리티 함수
+int _getUserPriorityScore(UserState user) {
+  if (user.online && user.stopwatchRunning) {
+    return 0; // 1순위: 활성화 O, 스톱워치 O
+  }
+  if (!user.online && user.stopwatchRunning) {
+    return 1; // 2순위: 활성화 X, 스톱워치 O
+  }
+  if (user.online && !user.stopwatchRunning) {
+    return 2; // 3순위: 활성화 O, 스톱워치 X
+  }
+  return 3; // 4순위: 활성화 X, 스톱워치 X
+}
+
+/// 정렬된 사용자 목록을 제공하는 프로바이더
 final sortedUsersProvider = Provider<List<UserState>>((ref) {
   final usersAsync = ref.watch(allUsersProvider);
   
@@ -12,23 +28,9 @@ final sortedUsersProvider = Provider<List<UserState>>((ref) {
       
       // 사용자 정렬 로직
       participants.sort((a, b) {
-        // 우선순위 점수 계산 (낮을수록 높은 우선순위)
-        int getPriorityScore(UserState user) {
-          if (user.online && user.stopwatchRunning) {
-            return 0; // 1순위: 활성화 O, 스톱워치 O
-          }
-          if (!user.online && user.stopwatchRunning) {
-            return 1; // 2순위: 활성화 X, 스톱워치 O
-          }
-          if (user.online && !user.stopwatchRunning) {
-            return 2; // 3순위: 활성화 O, 스톱워치 X
-          }
-          return 3; // 4순위: 활성화 X, 스톱워치 X
-        }
-
         // 우선순위 비교
-        final aPriority = getPriorityScore(a);
-        final bPriority = getPriorityScore(b);
+        final aPriority = _getUserPriorityScore(a);
+        final bPriority = _getUserPriorityScore(b);
 
         // 우선순위가 같으면 경과 시간으로 정렬 (내림차순)
         if (aPriority == bPriority) {

@@ -21,32 +21,30 @@ class UserAvatar extends ConsumerWidget {
     final isActive = user.online;
     final avatarUrl = ref.watch(userAvatarUrlProvider(user.userId));
 
-    final avatar = isActive
-        ? CircleAvatar(
-            key: Key(user.userId),
-            radius: radius,
-            backgroundImage: NetworkImage(avatarUrl),
-            backgroundColor: Colors.grey[300],
-          )
-        : ColorFiltered(
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.2),
-              BlendMode.srcATop,
-            ),
-            child: CircleAvatar(
+    final avatar =
+        isActive
+            ? CircleAvatar(
               key: Key(user.userId),
               radius: radius,
               backgroundImage: NetworkImage(avatarUrl),
               backgroundColor: Colors.grey[300],
-            ),
-          );
+            )
+            : ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                Colors.white.withValues(alpha: 0.5),
+                BlendMode.srcATop,
+              ),
+              child: CircleAvatar(
+                key: Key(user.userId),
+                radius: radius,
+                backgroundImage: NetworkImage(avatarUrl),
+                backgroundColor: Colors.grey[300],
+              ),
+            );
 
     // 필요한 경우에만 Hero 위젯 사용
     if (useHero) {
-      return Hero(
-        tag: 'avatar_${user.userId}',
-        child: avatar,
-      );
+      return Hero(tag: 'avatar_${user.userId}', child: avatar);
     }
 
     return avatar;
@@ -73,9 +71,12 @@ class StatusIndicator extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: isActive
-            ? (isRunning ? const Color(0xFF804EFF) : const Color(0xFFDFE0E6))
-            : const Color(0xFFDFE0E6),
+        color:
+            isActive
+                ? (isRunning
+                    ? const Color(0xFF804EFF)
+                    : const Color(0xFFDFE0E6))
+                : const Color(0xFFDFE0E6),
         border: Border.all(color: Colors.white, width: 2),
       ),
     );
